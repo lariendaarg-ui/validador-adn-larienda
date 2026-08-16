@@ -1,20 +1,25 @@
 import streamlit as st
 import pandas as pd
 
-# 1. Configuración general de la página
-st.set_page_config(page_title="Validador ADN Equino | La Rienda", page_icon="🐴", layout="centered")
+# 1. Configuración general
+st.set_page_config(page_title="Validador ADN Equino | La Rienda", page_icon="🐴", layout="wide")
 
-# 2. Carga del Logo (Si el archivo logo.png está en GitHub, lo muestra)
-try:
-    st.image("logo.png", width=220)
-except FileNotFoundError:
-    st.markdown("## 🐴 La Rienda")
+# 2. Diseño de Cabecera
+col1, col2 = st.columns([1, 6])
 
-st.title("Validador de ADN Equino")
-st.markdown("**Sistema de Gestión y Registros**")
+with col1:
+    try:
+        st.image("logo.png", width=120) 
+    except FileNotFoundError:
+        st.markdown("## 🐴")
+
+with col2:
+    st.title("Validador de ADN Equino")
+    st.markdown("**La Rienda - Sistema de Gestión y Registros**")
+
 st.markdown("---")
 
-# 3. Panel de instrucciones profesional
+# 3. Panel de instrucciones
 with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     st.markdown("""
     **Objetivo:**
@@ -24,6 +29,8 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     1. Ingresa los alelos (letras) correspondientes a cada marcador según el certificado de ADN.
     2. Puedes validar contra ambos padres (Trío) o contra uno solo (Dúo).
     3. Presiona el botón **Validar Compatibilidad** al final de la tabla para obtener el dictamen.
+    
+    *(Nota: El marcador HMS2 se omitirá automáticamente si se deja en blanco, para dar soporte a análisis de laboratorio antiguos).*
     """)
 
 # 4. Tabla de datos
@@ -43,7 +50,13 @@ st.caption("Haz doble clic en las celdas vacías para ingresar los alelos.")
 edited_df = st.data_editor(
     st.session_state.df,
     column_config={
-        "Marcador": st.column_config.TextColumn("Marcador", disabled=True),
+        "Marcador": st.column_config.TextColumn("Marcador", disabled=True, width="small"),
+        "Madre_A1": st.column_config.TextColumn("Madre 1", width="small"),
+        "Madre_A2": st.column_config.TextColumn("Madre 2", width="small"),
+        "Padre_A1": st.column_config.TextColumn("Padre 1", width="small"),
+        "Padre_A2": st.column_config.TextColumn("Padre 2", width="small"),
+        "Cria_A1": st.column_config.TextColumn("Cría 1", width="small"),
+        "Cria_A2": st.column_config.TextColumn("Cría 2", width="small"),
     },
     hide_index=True,
     use_container_width=True
@@ -58,7 +71,6 @@ def validar_marcador(row):
     p1, p2 = limpiar(row['Padre_A1']), limpiar(row['Padre_A2'])
     c1, c2 = limpiar(row['Cria_A1']), limpiar(row['Cria_A2'])
 
-    # Inferir alelo homocigoto si solo se ingresa uno
     if m1 and not m2: m2 = m1
     if m2 and not m1: m1 = m2
     if p1 and not p2: p2 = p1
@@ -69,6 +81,10 @@ def validar_marcador(row):
     c_alelos = {c1, c2} - {None}
     m_alelos = {m1, m2} - {None}
     p_alelos = {p1, p2} - {None}
+
+    # EXCEPCIÓN: Marcador HMS2 en análisis viejos
+    if row['Marcador'] == 'HMS2' and (not c_alelos or (not m_alelos and not p_alelos)):
+        return "Omitido"
 
     if not c_alelos: return "Faltan datos"
     if not m_alelos and not p_alelos: return "Faltan datos"
@@ -99,16 +115,16 @@ st.markdown("---")
 if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=True):
     edited_df['Resultado'] = edited_df.apply(validar_marcador, axis=1)
     
-    # Evaluar los marcadores para buscar exclusiones
-    marcadores_evaluados = edited_df[~edited_df['Resultado'].isin(["Faltan datos", "Error"])]
+    # Filtramos tanto los que faltan datos como el omitido a propósito para que no cuenten como error
+    marcadores_evaluados = edited_df[~edited_df['Resultado'].isin(["Faltan datos", "Error", "Omitido"])]
     excluidos = marcadores_evaluados[marcadores_evaluados['Resultado'] == "Excluido"].shape[0]
     
-    # Detectar qué progenitores fueron cargados en la tabla
-    hay_madre = edited_df['Madre_A1'].notna().any() or edited_df['Madre_A2'].notna().any()
-    hay_padre = edited_df['Padre_A1'].notna().any() or edited_df['Padre_A2'].notna().any()
-    hay_cria = edited_df['Cria_A1'].notna().any() or edited_df['Cria_A2'].notna().any()
+    # Detectar qué progenitores fueron cargados (ignorando la fila del HMS2 para no dar falsos negativos)
+    df_sin_hms2 = edited_df[edited_df['Marcador'] != 'HMS2']
+    hay_madre = df_sin_hms2['Madre_A1'].notna().any() or df_sin_hms2['Madre_A2'].notna().any()
+    hay_padre = df_sin_hms2['Padre_A1'].notna().any() or df_sin_hms2['Padre_A2'].notna().any()
+    hay_cria = df_sin_hms2['Cria_A1'].notna().any() or df_sin_hms2['Cria_A2'].notna().any()
 
-    # Mostrar Dictamen Final con las frases exactas
     st.markdown("### 📋 Dictamen Final")
     
     if not hay_cria or (not hay_madre and not hay_padre):
@@ -125,7 +141,12 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
                 st.success("✅ **Coincide con Padre**")
                 
     st.markdown("### 📊 Detalle por Marcador")
-    # Mostramos los resultados individuales con íconos visuales
+    
     df_visual = edited_df[['Marcador', 'Resultado']].copy()
-    df_visual['Resultado'] = df_visual['Resultado'].replace({"Compatible": "✅ Compatible", "Excluido": "❌ Excluido"})
+    # Actualizamos los reemplazos para incluir la nueva excepción visual
+    df_visual['Resultado'] = df_visual['Resultado'].replace({
+        "Compatible": "✅ Compatible", 
+        "Excluido": "❌ Excluido",
+        "Omitido": "⚪ Omitido (Análisis antiguo)"
+    })
     st.dataframe(df_visual, hide_index=True, use_container_width=True)
