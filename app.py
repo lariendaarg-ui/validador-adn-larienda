@@ -202,15 +202,15 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
 
 # 7. Pie de página - Datos de Contacto
 st.markdown("---")
-st.markdown("<h4 style='text-align: center; color: #4A4A4A;'>📞 Contacto La Rienda</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align: left; color: #4A4A4A;'>📞 Contacto La Rienda</h4>", unsafe_allow_html=True)
 
 c1, c2, c3, c4, c5 = st.columns([1, 2, 2, 2, 1])
 
 with c2:
-    st.markdown("<p style='text-align: center;'>📱 <a href='https://wa.me/5491132727729' style='color: #4A4A4A; text-decoration: none;'>+54 9 11 3272-7729</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: left;'>📱 <a href='https://wa.me/5491132727729' style='color: #4A4A4A; text-decoration: none;'>+54 9 11 3272-7729</a></p>", unsafe_allow_html=True)
 with c3:
-    st.markdown("<p style='text-align: center;'>📧 <a href='mailto:larienda.arg@gmail.com' style='color: #4A4A4A; text-decoration: none;'>larienda.arg@gmail.com</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: left;'>📧 <a href='mailto:larienda.arg@gmail.com' style='color: #4A4A4A; text-decoration: none;'>larienda.arg@gmail.com</a></p>", unsafe_allow_html=True)
 with c4:
-    st.markdown("<p style='text-align: center;'>📷 <a href='https://instagram.com/larienda.arg' style='color: #4A4A4A; text-decoration: none;'>@larienda.arg</a></p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: left;'>📷 <a href='https://instagram.com/larienda.arg' style='color: #4A4A4A; text-decoration: none;'>@larienda.arg</a></p>", unsafe_allow_html=True)
 
-st.markdown("<p style='text-align: center; font-size: 12px; color: #888888; margin-top: 20px;'>© 2026 La Rienda. Todos los derechos reservados.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: left; font-size: 12px; color: #888888; margin-top: 20px;'>© 2026 La Rienda. Todos los derechos reservados.</p>", unsafe_allow_html=True)
