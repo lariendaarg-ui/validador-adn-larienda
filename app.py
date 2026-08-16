@@ -39,14 +39,15 @@ marcadores = ['VHL20', 'HTG4', 'AHT4', 'HMS7', 'ASB2', 'ASB17', 'AHT5', 'HMS6', 
 if "df" not in st.session_state:
     st.session_state.df = pd.DataFrame({
         "Marcador": marcadores,
-        "Madre_A1": [None]*15, "Madre_A2": [None]*15,
-        "Padre_A1": [None]*15, "Padre_A2": [None]*15,
-        "Cria_A1": [None]*15,  "Cria_A2": [None]*15
+        "Madre_A1": [""]*15, "Madre_A2": [""]*15,
+        "Padre_A1": [""]*15, "Padre_A2": [""]*15,
+        "Cria_A1": [""]*15,  "Cria_A2": [""]*15
     })
 
 st.markdown("### 🧬 Datos Genéticos")
-st.caption("Haz doble clic en las celdas vacías para ingresar los alelos.")
+st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido.")
 
+# Agregamos height=620 para mostrar todas las filas sin scroll vertical
 edited_df = st.data_editor(
     st.session_state.df,
     column_config={
@@ -59,7 +60,8 @@ edited_df = st.data_editor(
         "Cria_A2": st.column_config.TextColumn("Cría 2", width="small"),
     },
     hide_index=True,
-    use_container_width=True
+    use_container_width=True,
+    height=620
 )
 
 # 5. Lógica Genética
@@ -121,9 +123,9 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
     
     # Detectar qué progenitores fueron cargados (ignorando la fila del HMS2 para no dar falsos negativos)
     df_sin_hms2 = edited_df[edited_df['Marcador'] != 'HMS2']
-    hay_madre = df_sin_hms2['Madre_A1'].notna().any() or df_sin_hms2['Madre_A2'].notna().any()
-    hay_padre = df_sin_hms2['Padre_A1'].notna().any() or df_sin_hms2['Padre_A2'].notna().any()
-    hay_cria = df_sin_hms2['Cria_A1'].notna().any() or df_sin_hms2['Cria_A2'].notna().any()
+    hay_madre = df_sin_hms2['Madre_A1'].replace("", None).notna().any() or df_sin_hms2['Madre_A2'].replace("", None).notna().any()
+    hay_padre = df_sin_hms2['Padre_A1'].replace("", None).notna().any() or df_sin_hms2['Padre_A2'].replace("", None).notna().any()
+    hay_cria = df_sin_hms2['Cria_A1'].replace("", None).notna().any() or df_sin_hms2['Cria_A2'].replace("", None).notna().any()
 
     st.markdown("### 📋 Dictamen Final")
     
@@ -149,4 +151,4 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
         "Excluido": "❌ Excluido",
         "Omitido": "⚪ Omitido (Análisis antiguo)"
     })
-    st.dataframe(df_visual, hide_index=True, use_container_width=True)
+    st.dataframe(df_visual, hide_index=True, use_container_width=True, height=580) # También ampliamos esta tabla
