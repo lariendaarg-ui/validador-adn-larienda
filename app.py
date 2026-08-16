@@ -30,7 +30,6 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     2. Puedes validar contra ambos padres (Trío) o contra uno solo (Dúo).
     3. Presiona el botón **Validar Compatibilidad** al final de la tabla para obtener el dictamen.
     
-    *(Nota: El marcador HMS2 se omitirá automáticamente si se deja en blanco, para dar soporte a análisis de laboratorio antiguos).*
     """)
 
 # 4. Tabla de datos
@@ -45,7 +44,7 @@ if "df" not in st.session_state:
     })
 
 st.markdown("### 🧬 Datos Genéticos")
-st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido.")
+st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido. Si estas desde el celular debes pulsar 2 veces sobre la celda para escribir")
 
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
