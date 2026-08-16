@@ -30,7 +30,7 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     2. Puedes validar contra ambos padres (Trío) o contra uno solo (Dúo).
     3. Presiona el botón **Validar Compatibilidad** al final de la tabla para obtener el dictamen.
     
-    *(Nota: El marcador HMS2 se omitirá automáticamente si se deja en blanco, para dar soporte a análisis de laboratorio antiguos).*
+    
     """)
 
 # 4. Tabla de datos
