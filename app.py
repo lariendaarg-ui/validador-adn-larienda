@@ -15,7 +15,7 @@ with col1:
 
 with col2:
     st.title("Validador de ADN Equino")
-    st.markdown("**La Rienda - Sistema de Gestión y Registros**")
+    st.markdown("**La Rienda - Gestión y Registros**")
 
 st.markdown("---")
 
