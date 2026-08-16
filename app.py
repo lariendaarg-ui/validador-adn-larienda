@@ -1,25 +1,20 @@
 import streamlit as st
 import pandas as pd
+import base64
 
 # 1. Configuración general
 st.set_page_config(page_title="Validador ADN Equino | La Rienda", page_icon="🐴", layout="wide")
 
-# CSS Mágico para adaptar el Logo a Celulares y PC sin usar columnas
-st.markdown("""
-    <style>
-        [data-testid="stImage"] {
-            display: flex;
-            justify-content: center;
-        }
-        [data-testid="stImage"] img {
-            max-width: 140px; /* Mantiene el tamaño elegante sin importar la pantalla */
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-# 2. Diseño de Cabecera (Logo centrado automáticamente por el CSS)
+# 2. Diseño de Cabecera (Logo Centrado Definitivo y Tamaño Fijo)
 try:
-    st.image("logo.png") 
+    with open("logo.png", "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode()
+    st.markdown(
+        f'<div style="display: flex; justify-content: center; margin-bottom: 10px;">'
+        f'<img src="data:image/png;base64,{encoded_string}" width="140">'
+        f'</div>',
+        unsafe_allow_html=True
+    )
 except FileNotFoundError:
     st.markdown("<h1 style='text-align: center;'>🐴</h1>", unsafe_allow_html=True)
 
@@ -41,8 +36,7 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     
     """)
 
-# Aviso exclusivo para mejorar la experiencia en celulares
-st.info("📱 **Tip para celulares:** Gira tu pantalla de forma horizontal para ver y completar toda la tabla con mayor comodidad. Presioná dos veces sobre la celda para editar")
+st.info("📱 **Tip para celulares:** Gira tu pantalla de forma horizontal para ver y completar toda la tabla con mayor comodidad. Presioná dos veces para editar una celda")
 
 # 4. Tabla de datos
 marcadores = ['VHL20', 'HTG4', 'AHT4', 'HMS7', 'ASB2', 'ASB17', 'AHT5', 'HMS6', 'ASB23', 'HTG10', 'HMS3', 'HMS2', 'CA425', 'TKY325', 'TKY28']
