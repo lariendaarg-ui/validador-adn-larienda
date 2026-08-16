@@ -15,7 +15,7 @@ with col1:
 
 with col2:
     st.title("Validador de ADN Equino")
-    st.markdown("**La Rienda - Gestión y Registros**")
+    st.markdown("**La Rienda - Gestión Genealógica y Registros Equinos**")
 
 st.markdown("---")
 
@@ -30,7 +30,7 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     2. Puedes validar contra ambos padres (Trío) o contra uno solo (Dúo).
     3. Presiona el botón **Validar Compatibilidad** al final de la tabla para obtener el dictamen.
     
-    
+    *(Nota: El marcador HMS2 se omitirá automáticamente si se deja en blanco, para dar soporte a análisis de laboratorio antiguos).*
     """)
 
 # 4. Tabla de datos
@@ -66,7 +66,7 @@ edited_df = st.data_editor(
     num_rows="fixed"
 )
 
-# 5. Lógica Genética Mejorada (Discrimina qué progenitor es compatible)
+# 5. Lógica Genética Mejorada
 def validar_marcador(row):
     def limpiar(val):
         return str(val).strip().upper() if pd.notna(val) and str(val).strip() != "" else None
@@ -106,13 +106,9 @@ def validar_marcador(row):
                 return "No compatible"
         else:
             ca, cb = list(c_alelos)[0], list(c_alelos)[1]
-            
-            # Chequeo cruzado (uno de la madre y uno del padre)
             both_match = (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos)
             if both_match:
                 return "Compatible con Padre y Madre"
-            
-            # Si falló el trío, revisamos si coincide con uno solo
             m_match = (ca in m_alelos) or (cb in m_alelos)
             p_match = (ca in p_alelos) or (cb in p_alelos)
             
@@ -125,12 +121,10 @@ def validar_marcador(row):
             else:
                 return "No compatible"
                 
-    # Si se cargó solo Madre
     elif m_alelos:
         if any(a in m_alelos for a in c_alelos): return "Compatible con Madre"
         else: return "No compatible"
         
-    # Si se cargó solo Padre
     elif p_alelos:
         if any(a in p_alelos for a in c_alelos): return "Compatible con Padre"
         else: return "No compatible"
@@ -165,7 +159,6 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
         if res in ["Faltan datos", "Error", "Omitido"]:
             continue
             
-        # Contamos las exclusiones por separado
         if m_present and p_present:
             if res == "Compatible con Madre": excluidos_padre += 1
             elif res == "Compatible con Padre": excluidos_madre += 1
@@ -207,8 +200,6 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
     st.markdown("### 📊 Detalle por Marcador")
     
     df_visual = edited_df[['Marcador', 'Resultado']].copy()
-    
-    # Agregamos los íconos a las frases exactas
     df_visual['Resultado'] = df_visual['Resultado'].replace({
         "Compatible con Padre y Madre": "✅ Compatible con Padre y Madre", 
         "Compatible con Madre": "✅ Compatible con Madre",
@@ -219,3 +210,18 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
     
     styled_visual = df_visual.style.set_properties(**{'text-align': 'center'})
     st.dataframe(styled_visual, hide_index=True, use_container_width=False, height=565)
+
+# 7. Pie de página - Datos de Contacto
+st.markdown("---")
+st.markdown("### 📞 Contacto La Rienda")
+
+col_contacto1, col_contacto2, col_contacto3 = st.columns(3)
+
+with col_contacto1:
+    st.markdown("📱 **WhatsApp:** [+54 9 11 3272-7729](https://wa.me/5491132727729)")
+with col_contacto2:
+    st.markdown("📧 **Email:** [larienda.arg@gmail.com](mailto:larienda.arg@gmail.com)")
+with col_contacto3:
+    st.markdown("📷 **Instagram:** [@larienda.arg](https://instagram.com/larienda.arg)")
+
+st.caption("© 2026 La Rienda. Todos los derechos reservados.")
