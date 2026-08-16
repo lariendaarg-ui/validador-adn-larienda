@@ -15,7 +15,7 @@ with col1:
 
 with col2:
     st.title("Validador de ADN Equino")
-    st.markdown("**La Rienda - Gestión y Registros**")
+    st.markdown("**La Rienda - Sistema de Gestión y Registros**")
 
 st.markdown("---")
 
@@ -47,20 +47,20 @@ if "df" not in st.session_state:
 st.markdown("### 🧬 Datos Genéticos")
 st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido.")
 
-# Aplicamos estilo de Pandas para centrar el texto en todas las celdas
+# Aplicamos estilo de Pandas para centrar el texto
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
-# Quitamos el parámetro 'width' para que Streamlit ajuste las columnas al tamaño de los títulos
+# Agregamos max_chars=1 para limitar a una sola letra por celda
 edited_df = st.data_editor(
     styled_df,
     column_config={
         "Marcador": st.column_config.TextColumn("Marcador", disabled=True),
-        "Madre_A1": st.column_config.TextColumn("Madre 1"),
-        "Madre_A2": st.column_config.TextColumn("Madre 2"),
-        "Padre_A1": st.column_config.TextColumn("Padre 1"),
-        "Padre_A2": st.column_config.TextColumn("Padre 2"),
-        "Cria_A1": st.column_config.TextColumn("Cría 1"),
-        "Cria_A2": st.column_config.TextColumn("Cría 2"),
+        "Madre_A1": st.column_config.TextColumn("Madre 1", max_chars=1),
+        "Madre_A2": st.column_config.TextColumn("Madre 2", max_chars=1),
+        "Padre_A1": st.column_config.TextColumn("Padre 1", max_chars=1),
+        "Padre_A2": st.column_config.TextColumn("Padre 2", max_chars=1),
+        "Cria_A1": st.column_config.TextColumn("Cría 1", max_chars=1),
+        "Cria_A2": st.column_config.TextColumn("Cría 2", max_chars=1),
     },
     hide_index=True,
     use_container_width=False,
@@ -155,6 +155,5 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
         "Omitido": "⚪ Omitido (Análisis antiguo)"
     })
     
-    # Centramos también la tabla visual final
     styled_visual = df_visual.style.set_properties(**{'text-align': 'center'})
     st.dataframe(styled_visual, hide_index=True, use_container_width=False, height=565)
