@@ -4,18 +4,19 @@ import pandas as pd
 # 1. Configuración general
 st.set_page_config(page_title="Validador ADN Equino | La Rienda", page_icon="🐴", layout="wide")
 
-# 2. Diseño de Cabecera
-col1, col2 = st.columns([1, 6])
+# 2. Diseño de Cabecera (Estilo Membrete Centrado)
+col_vacia1, col_logo, col_vacia3 = st.columns([3, 2, 3]) # Columnas para forzar el logo al centro
 
-with col1:
+with col_logo:
     try:
-        st.image("logo.png", width=120) 
+        # Se alinea al centro automáticamente por estar en la columna central
+        st.image("logo.png", use_container_width=True) 
     except FileNotFoundError:
-        st.markdown("## 🐴")
+        st.markdown("<h1 style='text-align: center;'>🐴</h1>", unsafe_allow_html=True)
 
-with col2:
-    st.title("Validador de ADN Equino")
-    st.markdown("**La Rienda - Gestión Genealógica y Registros Equinos**")
+# Títulos centrados usando HTML para darle un look más pulido
+st.markdown("<h1 style='text-align: center; padding-top: 0rem; margin-bottom: 0px;'>Validador de ADN Equino</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 18px; color: #4A4A4A; margin-top: 0px;'><b>La Rienda - Gestión Genealógica y Registros Equinos</b></p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -29,6 +30,7 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     1. Ingresa los alelos (letras) correspondientes a cada marcador según el certificado de ADN.
     2. Puedes validar contra ambos padres (Trío) o contra uno solo (Dúo).
     3. Presiona el botón **Validar Compatibilidad** al final de la tabla para obtener el dictamen.
+    
     
     """)
 
@@ -44,7 +46,7 @@ if "df" not in st.session_state:
     })
 
 st.markdown("### 🧬 Datos Genéticos")
-st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido. Si estas desde el celular debes pulsar 2 veces sobre la celda para escribir")
+st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido. Si estas desde el Celular presiona 2 veces sobre la celda para escribir")
 
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
@@ -65,7 +67,7 @@ edited_df = st.data_editor(
     num_rows="fixed"
 )
 
-# 5. Lógica Genética Mejorada
+# 5. Lógica Genética
 def validar_marcador(row):
     def limpiar(val):
         return str(val).strip().upper() if pd.notna(val) and str(val).strip() != "" else None
@@ -91,34 +93,23 @@ def validar_marcador(row):
     if not c_alelos: return "Faltan datos"
     if not m_alelos and not p_alelos: return "Faltan datos"
 
-    # Si se cargaron ambos padres
     if m_alelos and p_alelos:
         if len(c_alelos) == 1:
             c_val = list(c_alelos)[0]
-            if c_val in m_alelos and c_val in p_alelos: 
-                return "Compatible con Padre y Madre"
-            elif c_val in m_alelos:
-                return "Compatible con Madre"
-            elif c_val in p_alelos:
-                return "Compatible con Padre"
-            else: 
-                return "No compatible"
+            if c_val in m_alelos and c_val in p_alelos: return "Compatible con Padre y Madre"
+            elif c_val in m_alelos: return "Compatible con Madre"
+            elif c_val in p_alelos: return "Compatible con Padre"
+            else: return "No compatible"
         else:
             ca, cb = list(c_alelos)[0], list(c_alelos)[1]
             both_match = (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos)
-            if both_match:
-                return "Compatible con Padre y Madre"
+            if both_match: return "Compatible con Padre y Madre"
             m_match = (ca in m_alelos) or (cb in m_alelos)
             p_match = (ca in p_alelos) or (cb in p_alelos)
-            
-            if m_match and p_match:
-                return "Compatible con Padre y Madre"
-            elif m_match:
-                return "Compatible con Madre"
-            elif p_match:
-                return "Compatible con Padre"
-            else:
-                return "No compatible"
+            if m_match and p_match: return "Compatible con Padre y Madre"
+            elif m_match: return "Compatible con Madre"
+            elif p_match: return "Compatible con Padre"
+            else: return "No compatible"
                 
     elif m_alelos:
         if any(a in m_alelos for a in c_alelos): return "Compatible con Madre"
@@ -210,17 +201,18 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
     styled_visual = df_visual.style.set_properties(**{'text-align': 'center'})
     st.dataframe(styled_visual, hide_index=True, use_container_width=False, height=565)
 
-# 7. Pie de página - Datos de Contacto
+# 7. Pie de página - Datos de Contacto (Simétricos y Centrados)
 st.markdown("---")
-st.markdown("### 📞 Contacto La Rienda")
+st.markdown("<h4 style='text-align: center; color: #4A4A4A;'>📞 Contacto La Rienda</h4>", unsafe_allow_html=True)
 
-col_contacto1, col_contacto2, col_contacto3 = st.columns(3)
+# Creamos 5 columnas para empujar los datos al centro perfecto
+c1, c2, c3, c4, c5 = st.columns([1, 2, 2, 2, 1])
 
-with col_contacto1:
-    st.markdown("📱 **WhatsApp:** [+54 9 11 3272-7729](https://wa.me/5491132727729)")
-with col_contacto2:
-    st.markdown("📧 **Email:** [larienda.arg@gmail.com](mailto:larienda.arg@gmail.com)")
-with col_contacto3:
-    st.markdown("📷 **Instagram:** [@larienda.arg](https://instagram.com/larienda.arg)")
+with c2:
+    st.markdown("<p style='text-align: center;'>📱 <a href='https://wa.me/5491132727729' style='color: #4A4A4A; text-decoration: none;'>+54 9 11 3272-7729</a></p>", unsafe_allow_html=True)
+with c3:
+    st.markdown("<p style='text-align: center;'>📧 <a href='mailto:larienda.arg@gmail.com' style='color: #4A4A4A; text-decoration: none;'>larienda.arg@gmail.com</a></p>", unsafe_allow_html=True)
+with c4:
+    st.markdown("<p style='text-align: center;'>📷 <a href='https://instagram.com/larienda.arg' style='color: #4A4A4A; text-decoration: none;'>@larienda.arg</a></p>", unsafe_allow_html=True)
 
-st.caption("© 2026 La Rienda. Todos los derechos reservados.")
+st.markdown("<p style='text-align: center; font-size: 12px; color: #888888; margin-top: 20px;'>© 2026 La Rienda. Todos los derechos reservados.</p>", unsafe_allow_html=True)
