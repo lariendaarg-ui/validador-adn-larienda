@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(page_title="Validador ADN Equino | La Rienda", page_icon="🐴", layout="wide")
 
 # 2. Diseño de Cabecera (Estilo Membrete Centrado)
-col_vacia1, col_logo, col_vacia3 = st.columns([3, 2, 3])
+col_vacia1, col_logo, col_vacia3 = st.columns([4, 1.2, 4])
 
 with col_logo:
     try:
