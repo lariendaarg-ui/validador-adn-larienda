@@ -5,16 +5,14 @@ import pandas as pd
 st.set_page_config(page_title="Validador ADN Equino | La Rienda", page_icon="🐴", layout="wide")
 
 # 2. Diseño de Cabecera (Estilo Membrete Centrado)
-col_vacia1, col_logo, col_vacia3 = st.columns([3, 2, 3]) # Columnas para forzar el logo al centro
+col_vacia1, col_logo, col_vacia3 = st.columns([3, 2, 3])
 
 with col_logo:
     try:
-        # Se alinea al centro automáticamente por estar en la columna central
         st.image("logo.png", use_container_width=True) 
     except FileNotFoundError:
         st.markdown("<h1 style='text-align: center;'>🐴</h1>", unsafe_allow_html=True)
 
-# Títulos centrados usando HTML para darle un look más pulido
 st.markdown("<h1 style='text-align: center; padding-top: 0rem; margin-bottom: 0px;'>Validador de ADN Equino</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 18px; color: #4A4A4A; margin-top: 0px;'><b>La Rienda - Gestión Genealógica y Registros Equinos</b></p>", unsafe_allow_html=True)
 
@@ -46,20 +44,21 @@ if "df" not in st.session_state:
     })
 
 st.markdown("### 🧬 Datos Genéticos")
-st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido. Si estas desde el Celular presiona 2 veces sobre la celda para escribir")
+st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido. Si estas desde el celular presiona dos veces sobre la celda para editarla")
 
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
+# AQUI: Utilizamos \n para forzar el salto de línea y ahorrar espacio horizontal
 edited_df = st.data_editor(
     styled_df,
     column_config={
         "Marcador": st.column_config.TextColumn("Marcador", disabled=True),
-        "Madre_A1": st.column_config.TextColumn("Madre 1", max_chars=1),
-        "Madre_A2": st.column_config.TextColumn("Madre 2", max_chars=1),
-        "Padre_A1": st.column_config.TextColumn("Padre 1", max_chars=1),
-        "Padre_A2": st.column_config.TextColumn("Padre 2", max_chars=1),
-        "Cria_A1": st.column_config.TextColumn("Cría 1", max_chars=1),
-        "Cria_A2": st.column_config.TextColumn("Cría 2", max_chars=1),
+        "Madre_A1": st.column_config.TextColumn("Madre\nAlelo 1", max_chars=1),
+        "Madre_A2": st.column_config.TextColumn("Madre\nAlelo 2", max_chars=1),
+        "Padre_A1": st.column_config.TextColumn("Padre\nAlelo 1", max_chars=1),
+        "Padre_A2": st.column_config.TextColumn("Padre\nAlelo 2", max_chars=1),
+        "Cria_A1": st.column_config.TextColumn("Cría\nAlelo 1", max_chars=1),
+        "Cria_A2": st.column_config.TextColumn("Cría\nAlelo 2", max_chars=1),
     },
     hide_index=True,
     use_container_width=False,
@@ -201,11 +200,10 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
     styled_visual = df_visual.style.set_properties(**{'text-align': 'center'})
     st.dataframe(styled_visual, hide_index=True, use_container_width=False, height=565)
 
-# 7. Pie de página - Datos de Contacto (Simétricos y Centrados)
+# 7. Pie de página - Datos de Contacto
 st.markdown("---")
 st.markdown("<h4 style='text-align: center; color: #4A4A4A;'>📞 Contacto La Rienda</h4>", unsafe_allow_html=True)
 
-# Creamos 5 columnas para empujar los datos al centro perfecto
 c1, c2, c3, c4, c5 = st.columns([1, 2, 2, 2, 1])
 
 with c2:
