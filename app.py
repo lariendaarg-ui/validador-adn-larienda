@@ -15,7 +15,7 @@ with col1:
 
 with col2:
     st.title("Validador de ADN Equino")
-    st.markdown("**La Rienda - Sistema de Gestión y Registros**")
+    st.markdown("**La Rienda - Gestión y Registros**")
 
 st.markdown("---")
 
@@ -47,17 +47,20 @@ if "df" not in st.session_state:
 st.markdown("### 🧬 Datos Genéticos")
 st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido.")
 
-# Ajuste: use_container_width=False para evitar que las columnas se estiren
+# Aplicamos estilo de Pandas para centrar el texto en todas las celdas
+styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
+
+# Quitamos el parámetro 'width' para que Streamlit ajuste las columnas al tamaño de los títulos
 edited_df = st.data_editor(
-    st.session_state.df,
+    styled_df,
     column_config={
-        "Marcador": st.column_config.TextColumn("Marcador", disabled=True, width="small"),
-        "Madre_A1": st.column_config.TextColumn("Madre 1", width="small"),
-        "Madre_A2": st.column_config.TextColumn("Madre 2", width="small"),
-        "Padre_A1": st.column_config.TextColumn("Padre 1", width="small"),
-        "Padre_A2": st.column_config.TextColumn("Padre 2", width="small"),
-        "Cria_A1": st.column_config.TextColumn("Cría 1", width="small"),
-        "Cria_A2": st.column_config.TextColumn("Cría 2", width="small"),
+        "Marcador": st.column_config.TextColumn("Marcador", disabled=True),
+        "Madre_A1": st.column_config.TextColumn("Madre 1"),
+        "Madre_A2": st.column_config.TextColumn("Madre 2"),
+        "Padre_A1": st.column_config.TextColumn("Padre 1"),
+        "Padre_A2": st.column_config.TextColumn("Padre 2"),
+        "Cria_A1": st.column_config.TextColumn("Cría 1"),
+        "Cria_A2": st.column_config.TextColumn("Cría 2"),
     },
     hide_index=True,
     use_container_width=False,
@@ -114,7 +117,7 @@ def validar_marcador(row):
 
 st.markdown("---")
 
-# 6. Procesamiento y Dictamen Final (Botón ajustado)
+# 6. Procesamiento y Dictamen Final
 if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=False):
     edited_df['Resultado'] = edited_df.apply(validar_marcador, axis=1)
     
@@ -151,5 +154,7 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
         "Excluido": "❌ Excluido",
         "Omitido": "⚪ Omitido (Análisis antiguo)"
     })
-    # Tabla final también ajustada
-    st.dataframe(df_visual, hide_index=True, use_container_width=False, height=565)
+    
+    # Centramos también la tabla visual final
+    styled_visual = df_visual.style.set_properties(**{'text-align': 'center'})
+    st.dataframe(styled_visual, hide_index=True, use_container_width=False, height=565)
