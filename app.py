@@ -47,10 +47,8 @@ if "df" not in st.session_state:
 st.markdown("### 🧬 Datos Genéticos")
 st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido.")
 
-# Aplicamos estilo de Pandas para centrar el texto
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
-# Agregamos max_chars=1 para limitar a una sola letra por celda
 edited_df = st.data_editor(
     styled_df,
     column_config={
@@ -68,7 +66,7 @@ edited_df = st.data_editor(
     num_rows="fixed"
 )
 
-# 5. Lógica Genética
+# 5. Lógica Genética Mejorada (Discrimina qué progenitor es compatible)
 def validar_marcador(row):
     def limpiar(val):
         return str(val).strip().upper() if pd.notna(val) and str(val).strip() != "" else None
@@ -88,30 +86,54 @@ def validar_marcador(row):
     m_alelos = {m1, m2} - {None}
     p_alelos = {p1, p2} - {None}
 
-    # EXCEPCIÓN: Marcador HMS2 en análisis viejos
     if row['Marcador'] == 'HMS2' and (not c_alelos or (not m_alelos and not p_alelos)):
         return "Omitido"
 
     if not c_alelos: return "Faltan datos"
     if not m_alelos and not p_alelos: return "Faltan datos"
 
-    # Verificación de exclusión Mendeliana
+    # Si se cargaron ambos padres
     if m_alelos and p_alelos:
         if len(c_alelos) == 1:
             c_val = list(c_alelos)[0]
-            if c_val in m_alelos and c_val in p_alelos: return "Compatible"
-            else: return "Excluido"
+            if c_val in m_alelos and c_val in p_alelos: 
+                return "Compatible con Padre y Madre"
+            elif c_val in m_alelos:
+                return "Compatible con Madre"
+            elif c_val in p_alelos:
+                return "Compatible con Padre"
+            else: 
+                return "No compatible"
         else:
             ca, cb = list(c_alelos)[0], list(c_alelos)[1]
-            if (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos):
-                return "Compatible"
-            else: return "Excluido"
+            
+            # Chequeo cruzado (uno de la madre y uno del padre)
+            both_match = (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos)
+            if both_match:
+                return "Compatible con Padre y Madre"
+            
+            # Si falló el trío, revisamos si coincide con uno solo
+            m_match = (ca in m_alelos) or (cb in m_alelos)
+            p_match = (ca in p_alelos) or (cb in p_alelos)
+            
+            if m_match and p_match:
+                return "Compatible con Padre y Madre"
+            elif m_match:
+                return "Compatible con Madre"
+            elif p_match:
+                return "Compatible con Padre"
+            else:
+                return "No compatible"
+                
+    # Si se cargó solo Madre
     elif m_alelos:
-        if any(a in m_alelos for a in c_alelos): return "Compatible"
-        else: return "Excluido"
+        if any(a in m_alelos for a in c_alelos): return "Compatible con Madre"
+        else: return "No compatible"
+        
+    # Si se cargó solo Padre
     elif p_alelos:
-        if any(a in p_alelos for a in c_alelos): return "Compatible"
-        else: return "Excluido"
+        if any(a in p_alelos for a in c_alelos): return "Compatible con Padre"
+        else: return "No compatible"
     
     return "Error"
 
@@ -121,37 +143,77 @@ st.markdown("---")
 if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=False):
     edited_df['Resultado'] = edited_df.apply(validar_marcador, axis=1)
     
-    # Filtramos tanto los que faltan datos como el omitido a propósito para que no cuenten como error
-    marcadores_evaluados = edited_df[~edited_df['Resultado'].isin(["Faltan datos", "Error", "Omitido"])]
-    excluidos = marcadores_evaluados[marcadores_evaluados['Resultado'] == "Excluido"].shape[0]
+    excluidos_madre = 0
+    excluidos_padre = 0
+    hay_madre = False
+    hay_padre = False
+    hay_cria = False
     
-    # Detectar qué progenitores fueron cargados (ignorando la fila del HMS2 para no dar falsos negativos)
-    df_sin_hms2 = edited_df[edited_df['Marcador'] != 'HMS2']
-    hay_madre = df_sin_hms2['Madre_A1'].replace("", None).notna().any() or df_sin_hms2['Madre_A2'].replace("", None).notna().any()
-    hay_padre = df_sin_hms2['Padre_A1'].replace("", None).notna().any() or df_sin_hms2['Padre_A2'].replace("", None).notna().any()
-    hay_cria = df_sin_hms2['Cria_A1'].replace("", None).notna().any() or df_sin_hms2['Cria_A2'].replace("", None).notna().any()
+    for idx, row in edited_df.iterrows():
+        def has_data(a1, a2):
+            return (pd.notna(a1) and str(a1).strip() != "") or (pd.notna(a2) and str(a2).strip() != "")
+            
+        m_present = has_data(row['Madre_A1'], row['Madre_A2'])
+        p_present = has_data(row['Padre_A1'], row['Padre_A2'])
+        c_present = has_data(row['Cria_A1'], row['Cria_A2'])
+        
+        if m_present: hay_madre = True
+        if p_present: hay_padre = True
+        if c_present: hay_cria = True
+        
+        res = row['Resultado']
+        if res in ["Faltan datos", "Error", "Omitido"]:
+            continue
+            
+        # Contamos las exclusiones por separado
+        if m_present and p_present:
+            if res == "Compatible con Madre": excluidos_padre += 1
+            elif res == "Compatible con Padre": excluidos_madre += 1
+            elif res == "No compatible": 
+                excluidos_madre += 1
+                excluidos_padre += 1
+        elif m_present:
+            if res == "No compatible": excluidos_madre += 1
+        elif p_present:
+            if res == "No compatible": excluidos_padre += 1
 
     st.markdown("### 📋 Dictamen Final")
     
     if not hay_cria or (not hay_madre and not hay_padre):
         st.info("⚠️ Ingresa los datos de la cría y de al menos un progenitor para obtener el dictamen.")
     else:
-        if excluidos > 0:
-            st.error("🚨 **No compatible**")
-        else:
-            if hay_madre and hay_padre:
+        if hay_madre and hay_padre:
+            if excluidos_madre == 0 and excluidos_padre == 0:
                 st.success("✅ **Coincide con Padre y Madre**")
-            elif hay_madre:
+            elif excluidos_madre > 0 and excluidos_padre > 0:
+                st.error("🚨 **No compatible con ninguno de los dos**")
+            elif excluidos_padre > 0:
                 st.success("✅ **Coincide con Madre**")
-            elif hay_padre:
+                st.warning(f"⚠️ El presunto padre está excluido ({excluidos_padre} marcadores fallidos).")
+            elif excluidos_madre > 0:
                 st.success("✅ **Coincide con Padre**")
+                st.warning(f"⚠️ La presunta madre está excluida ({excluidos_madre} marcadores fallidos).")
+        elif hay_madre:
+            if excluidos_madre == 0:
+                st.success("✅ **Coincide con Madre**")
+            else:
+                st.error(f"🚨 **No compatible** ({excluidos_madre} marcadores excluidos para la madre)")
+        elif hay_padre:
+            if excluidos_padre == 0:
+                st.success("✅ **Coincide con Padre**")
+            else:
+                st.error(f"🚨 **No compatible** ({excluidos_padre} marcadores excluidos para el padre)")
                 
     st.markdown("### 📊 Detalle por Marcador")
     
     df_visual = edited_df[['Marcador', 'Resultado']].copy()
+    
+    # Agregamos los íconos a las frases exactas
     df_visual['Resultado'] = df_visual['Resultado'].replace({
-        "Compatible": "✅ Compatible", 
-        "Excluido": "❌ Excluido",
+        "Compatible con Padre y Madre": "✅ Compatible con Padre y Madre", 
+        "Compatible con Madre": "✅ Compatible con Madre",
+        "Compatible con Padre": "✅ Compatible con Padre",
+        "No compatible": "❌ No compatible",
         "Omitido": "⚪ Omitido (Análisis antiguo)"
     })
     
