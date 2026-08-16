@@ -4,21 +4,31 @@ import pandas as pd
 # 1. Configuración general
 st.set_page_config(page_title="Validador ADN Equino | La Rienda", page_icon="🐴", layout="wide")
 
-# 2. Diseño de Cabecera (Estilo Membrete Centrado)
-col_vacia1, col_logo, col_vacia3 = st.columns([4, 1.2, 4])
+# CSS Mágico para adaptar el Logo a Celulares y PC sin usar columnas
+st.markdown("""
+    <style>
+        [data-testid="stImage"] {
+            display: flex;
+            justify-content: center;
+        }
+        [data-testid="stImage"] img {
+            max-width: 140px; /* Mantiene el tamaño elegante sin importar la pantalla */
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-with col_logo:
-    try:
-        st.image("logo.png", use_container_width=True) 
-    except FileNotFoundError:
-        st.markdown("<h1 style='text-align: center;'>🐴</h1>", unsafe_allow_html=True)
+# 2. Diseño de Cabecera (Logo centrado automáticamente por el CSS)
+try:
+    st.image("logo.png") 
+except FileNotFoundError:
+    st.markdown("<h1 style='text-align: center;'>🐴</h1>", unsafe_allow_html=True)
 
 st.markdown("<h1 style='text-align: center; padding-top: 0rem; margin-bottom: 0px;'>Validador de ADN Equino</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 18px; color: #4A4A4A; margin-top: 0px;'><b>La Rienda - Gestión Genealógica y Registros Equinos</b></p>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 3. Panel de instrucciones
+# 3. Panel de instrucciones y Aviso para Celulares
 with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     st.markdown("""
     **Objetivo:**
@@ -29,8 +39,10 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     2. Puedes validar contra ambos padres (Trío) o contra uno solo (Dúo).
     3. Presiona el botón **Validar Compatibilidad** al final de la tabla para obtener el dictamen.
     
-    
     """)
+
+# Aviso exclusivo para mejorar la experiencia en celulares
+st.info("📱 **Tip para celulares:** Gira tu pantalla de forma horizontal para ver y completar toda la tabla con mayor comodidad. Presioná dos veces sobre la celda para editar")
 
 # 4. Tabla de datos
 marcadores = ['VHL20', 'HTG4', 'AHT4', 'HMS7', 'ASB2', 'ASB17', 'AHT5', 'HMS6', 'ASB23', 'HTG10', 'HMS3', 'HMS2', 'CA425', 'TKY325', 'TKY28']
@@ -44,11 +56,10 @@ if "df" not in st.session_state:
     })
 
 st.markdown("### 🧬 Datos Genéticos")
-st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido. Si estas desde el celular presiona dos veces sobre la celda para editarla")
+st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra.")
 
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
-# AQUI: Utilizamos \n para forzar el salto de línea y ahorrar espacio horizontal
 edited_df = st.data_editor(
     styled_df,
     column_config={
@@ -200,7 +211,7 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
     styled_visual = df_visual.style.set_properties(**{'text-align': 'center'})
     st.dataframe(styled_visual, hide_index=True, use_container_width=False, height=565)
 
-# 7. Pie de página - Datos de Contacto
+# 7. Pie de página - Datos de Contacto (Alineado completamente a la izquierda)
 st.markdown("---")
 st.markdown("<h4 style='text-align: left; color: #4A4A4A;'>📞 Contacto La Rienda</h4>", unsafe_allow_html=True)
 
