@@ -47,7 +47,7 @@ if "df" not in st.session_state:
 st.markdown("### 🧬 Datos Genéticos")
 st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Puedes usar la tecla 'Tab' o las flechas de tu teclado para moverte más rápido.")
 
-# Agregamos height=620 para mostrar todas las filas sin scroll vertical
+# Ajuste: use_container_width=False para evitar que las columnas se estiren
 edited_df = st.data_editor(
     st.session_state.df,
     column_config={
@@ -60,8 +60,9 @@ edited_df = st.data_editor(
         "Cria_A2": st.column_config.TextColumn("Cría 2", width="small"),
     },
     hide_index=True,
-    use_container_width=True,
-    height=620
+    use_container_width=False,
+    height=565,
+    num_rows="fixed"
 )
 
 # 5. Lógica Genética
@@ -113,8 +114,8 @@ def validar_marcador(row):
 
 st.markdown("---")
 
-# 6. Procesamiento y Dictamen Final
-if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=True):
+# 6. Procesamiento y Dictamen Final (Botón ajustado)
+if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=False):
     edited_df['Resultado'] = edited_df.apply(validar_marcador, axis=1)
     
     # Filtramos tanto los que faltan datos como el omitido a propósito para que no cuenten como error
@@ -145,10 +146,10 @@ if st.button("🔍 Validar Compatibilidad", type="primary", use_container_width=
     st.markdown("### 📊 Detalle por Marcador")
     
     df_visual = edited_df[['Marcador', 'Resultado']].copy()
-    # Actualizamos los reemplazos para incluir la nueva excepción visual
     df_visual['Resultado'] = df_visual['Resultado'].replace({
         "Compatible": "✅ Compatible", 
         "Excluido": "❌ Excluido",
         "Omitido": "⚪ Omitido (Análisis antiguo)"
     })
-    st.dataframe(df_visual, hide_index=True, use_container_width=True, height=580) # También ampliamos esta tabla
+    # Tabla final también ajustada
+    st.dataframe(df_visual, hide_index=True, use_container_width=False, height=565)
