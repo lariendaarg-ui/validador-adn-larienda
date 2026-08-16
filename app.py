@@ -36,7 +36,7 @@ with st.expander("ℹ️ ¿Cómo funciona este validador?", expanded=False):
     
     """)
 
-st.info("📱 **Tip para celulares:** Gira tu pantalla de forma horizontal para ver y completar toda la tabla con mayor comodidad. Presioná dos veces para editar una celda")
+st.info("📱 **Tip para celulares:** Gira tu pantalla de forma horizontal para ver y completar toda la tabla con mayor comodidad")
 
 # 4. Tabla de datos
 marcadores = ['VHL20', 'HTG4', 'AHT4', 'HMS7', 'ASB2', 'ASB17', 'AHT5', 'HMS6', 'ASB23', 'HTG10', 'HMS3', 'HMS2', 'CA425', 'TKY325', 'TKY28']
@@ -50,7 +50,7 @@ if "df" not in st.session_state:
     })
 
 st.markdown("### 🧬 Datos Genéticos")
-st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra.")
+st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Desde el Celular presioná dos veces sobre la celda para escrbir")
 
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
