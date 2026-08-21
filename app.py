@@ -104,31 +104,31 @@ def validar_marcador(row):
             elif c_val in m_alelos: return "Compatible con Madre"
             elif c_val in p_alelos: return "Compatible con Padre"
             else: return "No compatible"
-       else:
-            ca, cb = list(c_alelos)[0], list(c_alelos)[1]
+        else:
+             ca, cb = list(c_alelos)[0], list(c_alelos)[1]
             
-            # 1. Condición estricta perfecta (Trío compatible)
-            both_match = (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos)
+             # 1. Condición estricta perfecta (Trío compatible)
+             both_match = (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos)
             
-            if both_match: 
+             if both_match: 
                 return "Compatible con Padre y Madre"
             
-            # 2. Evaluamos compatibilidades individuales (Dúos)
-            m_match = (ca in m_alelos) or (cb in m_alelos)
-            p_match = (ca in p_alelos) or (cb in p_alelos)
+             # 2. Evaluamos compatibilidades individuales (Dúos)
+             m_match = (ca in m_alelos) or (cb in m_alelos)
+             p_match = (ca in p_alelos) or (cb in p_alelos)
             
-            if m_match and not p_match: 
+             if m_match and not p_match: 
                 return "Compatible con Madre"
-            elif p_match and not m_match: 
+             elif p_match and not m_match: 
                 return "Compatible con Padre"
-            elif m_match and p_match:
-                # 3. Regla de Anclaje Materno: 
-                # Ambos comparten un alelo (ej: 'I'), pero el otro está huérfano (ej: 'L').
-                # Asumimos que la madre aportó el suyo válido, forzando al padre a aportar el faltante.
-                # Como el padre no lo tiene, él queda excluido.
-                return "Compatible con Madre"
-            else: 
-                return "No compatible"
+             elif m_match and p_match:
+                 # 3. Regla de Anclaje Materno: 
+                 # Ambos comparten un alelo (ej: 'I'), pero el otro está huérfano (ej: 'L').
+                 # Asumimos que la madre aportó el suyo válido, forzando al padre a aportar el faltante.
+                 # Como el padre no lo tiene, él queda excluido.
+                 return "Compatible con Madre"
+             else: 
+                 return "No compatible"
                 
     elif m_alelos:
         if any(a in m_alelos for a in c_alelos): return "Compatible con Madre"
