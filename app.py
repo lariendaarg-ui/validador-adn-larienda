@@ -51,6 +51,7 @@ if "df" not in st.session_state:
 
 st.markdown("### 🧬 Datos Genéticos")
 st.caption("💡 **Tip:** Haz un solo clic en la celda y escribe directamente la letra. Desde el Celular presioná dos veces sobre la celda para escrbir")
+st.caption("📌 **Aclaración:** Si en el certificado un marcador figura con una sola letra (por ejemplo, **K/**), debés repetir la letra e ingresarla en ambos casilleros (Alelo 1: **K** y Alelo 2: **K**).")
 
 styled_df = st.session_state.df.style.set_properties(**{'text-align': 'center'})
 
