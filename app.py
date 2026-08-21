@@ -104,16 +104,16 @@ def validar_marcador(row):
             elif c_val in m_alelos: return "Compatible con Madre"
             elif c_val in p_alelos: return "Compatible con Padre"
             else: return "No compatible"
-        else:
+       else:
             ca, cb = list(c_alelos)[0], list(c_alelos)[1]
             
-            # 1. Condición estricta: un alelo de un padre y el otro del otro
+            # 1. Condición estricta perfecta (Trío compatible)
             both_match = (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos)
             
             if both_match: 
                 return "Compatible con Padre y Madre"
             
-            # 2. Si fallan como pareja, evaluamos si al menos UNO podría ser el padre biológico (Dúo)
+            # 2. Evaluamos compatibilidades individuales (Dúos)
             m_match = (ca in m_alelos) or (cb in m_alelos)
             p_match = (ca in p_alelos) or (cb in p_alelos)
             
@@ -121,9 +121,13 @@ def validar_marcador(row):
                 return "Compatible con Madre"
             elif p_match and not m_match: 
                 return "Compatible con Padre"
+            elif m_match and p_match:
+                # 3. Regla de Anclaje Materno: 
+                # Ambos comparten un alelo (ej: 'I'), pero el otro está huérfano (ej: 'L').
+                # Asumimos que la madre aportó el suyo válido, forzando al padre a aportar el faltante.
+                # Como el padre no lo tiene, él queda excluido.
+                return "Compatible con Madre"
             else: 
-                # Cae aquí si ninguno coincide, O si ambos tienen coincidencias parciales 
-                # (ej: los dos aportan 'K') pero dejan un alelo de la cría huérfano (ej: 'N').
                 return "No compatible"
                 
     elif m_alelos:
