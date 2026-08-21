@@ -106,14 +106,25 @@ def validar_marcador(row):
             else: return "No compatible"
         else:
             ca, cb = list(c_alelos)[0], list(c_alelos)[1]
+            
+            # 1. Condición estricta: un alelo de un padre y el otro del otro
             both_match = (ca in m_alelos and cb in p_alelos) or (cb in m_alelos and ca in p_alelos)
-            if both_match: return "Compatible con Padre y Madre"
+            
+            if both_match: 
+                return "Compatible con Padre y Madre"
+            
+            # 2. Si fallan como pareja, evaluamos si al menos UNO podría ser el padre biológico (Dúo)
             m_match = (ca in m_alelos) or (cb in m_alelos)
             p_match = (ca in p_alelos) or (cb in p_alelos)
-            if m_match and p_match: return "Compatible con Padre y Madre"
-            elif m_match: return "Compatible con Madre"
-            elif p_match: return "Compatible con Padre"
-            else: return "No compatible"
+            
+            if m_match and not p_match: 
+                return "Compatible con Madre"
+            elif p_match and not m_match: 
+                return "Compatible con Padre"
+            else: 
+                # Cae aquí si ninguno coincide, O si ambos tienen coincidencias parciales 
+                # (ej: los dos aportan 'K') pero dejan un alelo de la cría huérfano (ej: 'N').
+                return "No compatible"
                 
     elif m_alelos:
         if any(a in m_alelos for a in c_alelos): return "Compatible con Madre"
